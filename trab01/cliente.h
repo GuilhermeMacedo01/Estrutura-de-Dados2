@@ -29,6 +29,8 @@ void Salva(Cliente *func, FILE *out) {
     fwrite(func->nome, sizeof(char),
         sizeof(func->nome), out);
 
+    long posicao = ftell(out);
+    inserirNaTabela(func->codCliente, posicao);
 }
 
 Cliente *le(FILE *in) {
