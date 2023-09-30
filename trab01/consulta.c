@@ -81,11 +81,37 @@ int main(int argc, char** argv) {
 
     // Salvar a tabela hash no arquivo "tabela_hash"
     salvarTabelaHash();
+
+    arquivo = fopen("tabela_hash.dat", "rb");
+
+    if (arquivo == NULL) {
+        perror("Erro ao abrir o arquivo");
+        return 1;
+    }
+
+    FILE *arquivoClientes;
+    int chaveProcurada;
+
+    // Abra o arquivo de clientes em modo de leitura binária
+    arquivoClientes = fopen("clientes.dat", "rb");
+
+    if (arquivoClientes == NULL) {
+        perror("Erro ao abrir o arquivo de clientes");
+        return 1;
+    }
+
+    printf("Digite a chave do cliente a ser procurado: ");
+    scanf("%d", &chaveProcurada);
+
+    buscarCliente(arquivoClientes, chaveProcurada);
    
 
     // Carregar a tabela hash a partir do arquivo "tabela_hash"
     carregarTabelaHash();
 
+    fclose(arquivo);
+    fclose(arquivoClientes);
+    
     return 0;
 
 }

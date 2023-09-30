@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+
 typedef struct Cliente {
 
     int codCliente;
@@ -44,4 +45,29 @@ Cliente *le(FILE *in) {
     fread(func->nome, sizeof(char), sizeof(func->nome), in);
 
     return func;
+}
+
+int calcularIndiceHash(int chave) {
+    return chave % 7;
+}
+
+void buscarCliente(FILE *arquivo, int chave) {
+    Cliente cliente;
+    int indice = calcularIndiceHash(chave);
+
+    // Posicionar-se no início do registro na tabela hash
+    fseek(arquivo, sizeof(Cliente) * indice, SEEK_SET);
+
+    // Ler o cliente correspondente
+    fread(&cliente, sizeof(Cliente), 1, arquivo);
+
+    // Verificar se a chave corresponde ao cliente desejado
+    if (cliente.codCliente == chave) {
+        printf("Cliente encontrado:\n");
+        printf("Chave: %d\n", cliente.codCliente);
+        printf("Nome: %s\n", cliente.nome);
+        // Exibir outros campos do cliente, se necessário
+    } else {
+        printf("Cliente com chave %d não encontrado.\n", chave);
+    }
 }

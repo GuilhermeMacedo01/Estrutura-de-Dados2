@@ -49,6 +49,8 @@ void salvarTabelaHash() {
     }
 
     for (int i = 0; i < TABLE_SIZE; i++) {
+
+        
         HashNode* noAtual = tabelaHash[i];
         while (noAtual != NULL) {
             fwrite(&noAtual->chave, sizeof(int), 1, arquivoHash);
@@ -56,6 +58,7 @@ void salvarTabelaHash() {
 
             noAtual = noAtual->proximo;
         }
+
     }
 
     fclose(arquivoHash);
