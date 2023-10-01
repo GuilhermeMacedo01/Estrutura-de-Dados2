@@ -71,3 +71,46 @@ void buscarCliente(FILE *arquivo, int chave) {
         printf("Cliente com chave %d não encontrado.\n", chave);
     }
 }
+
+void removerCliente(const char *nomeArquivo, int chave) {
+    FILE *arquivoOriginal, *arquivoTemporario;
+    Cliente cliente;
+
+    // Abra o arquivo original em modo de leitura binária
+    arquivoOriginal = fopen(nomeArquivo, "rb");
+
+    if (arquivoOriginal == NULL) {
+        perror("Erro ao abrir o arquivo de clientes");
+        return;
+    }
+
+    // Abra um arquivo temporário em modo de escrita binária
+    arquivoTemporario = fopen("temporario.dat", "wb");
+
+    if (arquivoTemporario == NULL) {
+        perror("Erro ao criar o arquivo temporário");
+        fclose(arquivoOriginal);
+        return;
+    }
+
+    // Percorra o arquivo original e copie os clientes para o arquivo temporário, exceto o que deseja remover
+    while (fread(&cliente, sizeof(Cliente), 1, arquivoOriginal) == 1) {
+        if (cliente.codCliente != chave) {
+            fwrite(&cliente, sizeof(Cliente), 1, arquivoTemporario);
+        }
+    }
+
+    // Feche ambos os arquivos
+    fclose(arquivoOriginal);
+    fclose(arquivoTemporario);
+
+    // Substitua o arquivo original pelo arquivo temporário
+    if (remove(nomeArquivo) != 0) {
+        perror("Erro ao excluir o arquivo original");
+        return;
+    }
+    
+    if (rename("temporario.dat", nomeArquivo) != 0) {
+        perror("Erro ao renomear o arquivo temporário");
+    }
+}

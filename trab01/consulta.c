@@ -100,18 +100,22 @@ int main(int argc, char** argv) {
         return 1;
     }
 
+    printf("\n<---------- Procurar cliente ---------->\n\n");
     printf("Digite a chave do cliente a ser procurado: ");
     scanf("%d", &chaveProcurada);
 
+    
+
     buscarCliente(arquivoClientes, chaveProcurada);
-   
+
+    removerCliente("clientes.dat",49);
 
     // Carregar a tabela hash a partir do arquivo "tabela_hash"
     carregarTabelaHash();
 
     fclose(arquivo);
     fclose(arquivoClientes);
-    
+
     return 0;
 
 }
