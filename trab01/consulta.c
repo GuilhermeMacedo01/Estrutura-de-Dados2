@@ -3,6 +3,22 @@
 #include "cliente.h"
 #include "compartimento_hash.h"
 
+void imprimeClientes(FILE *arquivo){
+    Cliente *clienteLido;
+
+    fseek(arquivo, 0, SEEK_SET);
+
+    while ((clienteLido = le(arquivo)) != NULL)
+     {
+        long posicao = buscarNaTabela(clienteLido->codCliente);
+        printf("Codigo do Cliente: %d\n", clienteLido->codCliente);
+        printf("Nome do Cliente: %s\n", clienteLido->nome);
+        printf("Posicao no arquivo: %ld\n", posicao);
+        free(clienteLido); // Liberar memória alocada para cada cliente
+       
+    }
+}
+
 int main(int argc, char** argv) {
 
     for (int i = 0; i < TABLE_SIZE; i++) 
@@ -32,12 +48,12 @@ int main(int argc, char** argv) {
     }*/
 
     // Criar e salvar alguns clientes
-    Cliente cliente1 = {49, "Joao"};
-    Cliente cliente2 = {51, "Carla"};
-    Cliente cliente3 = {59, "Maria"};
-    Cliente cliente4 = {3, "Jose"};
-    Cliente cliente5 = {87, "Bia"};
-    Cliente cliente6 = {103, "Ana"};
+    Cliente cliente1 = {49, "Tiquinho",0};
+    Cliente cliente2 = {51, "Luis Henrique",0};
+    Cliente cliente3 = {59, "Janderson",0};
+    Cliente cliente4 = {3, "Adryelson",0};
+    Cliente cliente5 = {87, "Lucas Perri",0};
+    Cliente cliente6 = {103, "Segovinha",0};
     
 
     Salva(&cliente1, arquivo);
@@ -108,13 +124,39 @@ int main(int argc, char** argv) {
 
     buscarCliente(arquivoClientes, chaveProcurada);
 
-    removerCliente("clientes.dat",49);
+    removerCliente(49);
 
     // Carregar a tabela hash a partir do arquivo "tabela_hash"
     carregarTabelaHash();
 
     fclose(arquivo);
     fclose(arquivoClientes);
+
+    FILE *arquivo2;
+
+    // Abrir o arquivo no modo "r+b" para escrita e leitura binária
+    arquivo2 = fopen("clientes.dat", "a+b");
+    fseek(arquivo2, 0, SEEK_SET);
+
+    printf("\n<---------- Pos remocao---------->\n\n");
+
+    Cliente cliente8 = {49, "Diego  Costa"};
+    Salva(&cliente8, arquivo2);
+
+    fclose(arquivo2);
+
+    // Abre o arquivo para leitura binária
+    arquivo2 = fopen("clientes.dat", "r+b");
+
+    if (arquivo2 == NULL) 
+    {
+        printf("Não foi possível abrir o arquivo novamente.\n\n");
+        return 1;
+    }
+
+
+    imprimeClientes(arquivo2);
+    fclose(arquivo2);
 
     return 0;
 
