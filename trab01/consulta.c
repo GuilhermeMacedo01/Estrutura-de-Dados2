@@ -40,20 +40,28 @@ int main(int argc, char** argv) {
 
     int i = 0;
 
-    /*while(i<5)
+    // Criar e salvar alguns clientes
+
+    /*while (i<6)
     {
-        // Escrever dados no arquivo
         criarCliente(arquivo);
         i++;
     }*/
-
-    // Criar e salvar alguns clientes
-    Cliente cliente1 = {49, "Tiquinho",0};
-    Cliente cliente2 = {51, "Luis Henrique",0};
-    Cliente cliente3 = {59, "Janderson",0};
-    Cliente cliente4 = {3, "Adryelson",0};
-    Cliente cliente5 = {87, "Lucas Perri",0};
-    Cliente cliente6 = {103, "Segovinha",0};
+    
+    Cliente cliente1 = {
+        cliente1.codCliente = 49, 
+       "Tiquinho",
+        cliente1.status = 1};
+    Cliente cliente2 = {
+       cliente2.codCliente = 51, "Luis Henrique",1};
+    Cliente cliente3 = {
+        cliente3.codCliente = 59, "Janderson",1};
+    Cliente cliente4 = {
+        cliente4.codCliente = 3, "Adryelson",1};
+    Cliente cliente5 = {
+        cliente5.codCliente = 87, "Lucas Perri",1};
+    Cliente cliente6 = {
+        cliente6.codCliente = 103, "Segovinha",1};
     
 
     Salva(&cliente1, arquivo);
@@ -78,19 +86,7 @@ int main(int argc, char** argv) {
     }
 
     // Ler e imprimir os clientes do arquivo
-    Cliente *clienteLido;
-
-    fseek(arquivo, 0, SEEK_SET);
-
-    while ((clienteLido = le(arquivo)) != NULL)
-     {
-        long posicao = buscarNaTabela(clienteLido->codCliente);
-        printf("Codigo do Cliente: %d\n", clienteLido->codCliente);
-        printf("Nome do Cliente: %s\n", clienteLido->nome);
-        printf("Posicao no arquivo: %ld\n", posicao);
-        free(clienteLido); // Liberar memória alocada para cada cliente
-       
-    }
+    imprimeClientes(arquivo);
 
     // Fechar o arquivo novamente
     fclose(arquivo);
@@ -98,7 +94,7 @@ int main(int argc, char** argv) {
     // Salvar a tabela hash no arquivo "tabela_hash"
     salvarTabelaHash();
 
-    arquivo = fopen("tabela_hash.dat", "rb");
+    arquivo = fopen("tabela_hash.dat", "r+b");
 
     if (arquivo == NULL) {
         perror("Erro ao abrir o arquivo");
@@ -109,7 +105,7 @@ int main(int argc, char** argv) {
     int chaveProcurada;
 
     // Abra o arquivo de clientes em modo de leitura binária
-    arquivoClientes = fopen("clientes.dat", "rb");
+    arquivoClientes = fopen("clientes.dat", "r+b");
 
     if (arquivoClientes == NULL) {
         perror("Erro ao abrir o arquivo de clientes");
@@ -120,11 +116,12 @@ int main(int argc, char** argv) {
     printf("Digite a chave do cliente a ser procurado: ");
     scanf("%d", &chaveProcurada);
 
-    
 
+    //Função para buscar um cliente
     buscarCliente(arquivoClientes, chaveProcurada);
 
-    removerCliente(49);
+    //Função para remover Cliente
+    //remover(arquivoClientes,chaveProcurada);
 
     // Carregar a tabela hash a partir do arquivo "tabela_hash"
     carregarTabelaHash();
@@ -140,7 +137,7 @@ int main(int argc, char** argv) {
 
     printf("\n<---------- Pos remocao---------->\n\n");
 
-    Cliente cliente8 = {49, "Diego  Costa"};
+    Cliente cliente8 = {2, "Diego  Costa",1};
     Salva(&cliente8, arquivo2);
 
     fclose(arquivo2);
@@ -160,4 +157,9 @@ int main(int argc, char** argv) {
 
     return 0;
 
+}
+
+void remover(FILE *arquivo, int chave){
+    removerCliente(49);
+    marcarPosicaoLivre(arquivo, 49);
 }
