@@ -1,18 +1,97 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define TABLE_SIZE 7
 
 typedef struct Cliente {
-
     int codCliente;
     char nome[100];
     int status;
-
-
 } Cliente;
 
-// cria e retorna um tipo pessoa
-void criarCliente(FILE *arquivo) {
+typedef struct HashNode {
+    int chave;
+    long posicao;
+    struct HashNode* proximo;
+} HashNode;
+
+HashNode* tabelaHash[TABLE_SIZE];
+FILE* arquivoClientes; // Arquivo que armazena os registros dos clientes
+
+int hash(int chave) {
+    return chave % TABLE_SIZE;
+}
+
+void inicializarTabela() {
+    for (int i = 0; i < TABLE_SIZE; i++) {
+        tabelaHash[i] = NULL;
+    }
+}
+
+void inserirNaTabela(int chave, long posicao) {
+    int indice = hash(chave);
+    HashNode* novoNo = (HashNode*)malloc(sizeof(HashNode));
+    novoNo->chave = chave;
+    novoNo->posicao = posicao;
+    novoNo->proximo = tabelaHash[indice];
+    tabelaHash[indice] = novoNo;
+}
+
+long buscarNaTabela(int chave) {
+    int indice = hash(chave);
+    HashNode* noAtual = tabelaHash[indice];
+    while (noAtual != NULL) {
+        if (noAtual->chave == chave) {
+            return noAtual->posicao;
+        }
+        noAtual = noAtual->proximo;
+    }
+    return -1; // Cliente não encontrado na tabela ou posição livre
+}
+
+void salvarTabelaHash() {
+    FILE* arquivoHash = fopen("tabela_hash.dat", "w+b");
+
+    if (arquivoHash == NULL) {
+        printf("Não foi possível abrir o arquivo da tabela hash.\n");
+        return;
+    }
+
+    for (int i = 0; i < TABLE_SIZE; i++) {
+        HashNode* noAtual = tabelaHash[i];
+        while (noAtual != NULL) {
+            fwrite(&noAtual->chave, sizeof(int), 1, arquivoHash);
+            fwrite(&noAtual->posicao, sizeof(long), 1, arquivoHash);
+            noAtual = noAtual->proximo;
+        }
+    }
+
+    fclose(arquivoHash);
+}
+
+void carregarTabelaHash() {
+    FILE* arquivoHash = fopen("tabela_hash.dat", "rb");
+
+    if (arquivoHash == NULL) {
+        printf("Não foi possível abrir o arquivo da tabela hash.\n");
+        return;
+    }
+
+    for (int i = 0; i < TABLE_SIZE; i++) {
+        tabelaHash[i] = NULL;
+    }
+
+    int chave;
+    long posicao;
+    while (fread(&chave, sizeof(int), 1, arquivoHash) == 1 &&
+           fread(&posicao, sizeof(long), 1, arquivoHash) == 1) {
+        inserirNaTabela(chave, posicao);
+    }
+
+    fclose(arquivoHash);
+}
+
+void criarCliente() {
     Cliente c;
     printf("Digite o nome da pessoa: ");
     scanf("%*c");
@@ -20,107 +99,66 @@ void criarCliente(FILE *arquivo) {
     printf("Digite a matricula: ");
     scanf("%d", &c.codCliente);
     c.status = 1; // Defina o status como 1 (ocupado) por padrão
-    Salva(&c, arquivo);
+
+    // Salvar o cliente no arquivo de clientes e obter a posição no arquivo
+    fseek(arquivoClientes, 0, SEEK_END);
+    long posicao = ftell(arquivoClientes);
+    fwrite(&c, sizeof(Cliente), 1, arquivoClientes);
+
+    // Atualizar a tabela hash com a chave do cliente e a posição no arquivo
+    inserirNaTabela(c.codCliente, posicao);
 }
 
-// Salva no arquivo out, na posição atual do cursor
-void Salva(Cliente *func, FILE *out) {
-    // Verifique o status antes de salvar
-    if (func->status == 0) {
-        // A posição pode ser sobrescrita, então não atualize o status
-        fseek(out, -(long)sizeof(Cliente), SEEK_CUR);
-    } else {
-        // Posicione-se no final do arquivo para adicionar um novo registro
-        fseek(out, 0, SEEK_END);
-    }
-
-    fwrite(&func->codCliente, sizeof(int), 1, out);
-    fwrite(func->nome, sizeof(char), sizeof(func->nome), out);
-
-    // Se o status for 0, mantenha o status anterior, caso contrário, defina como 1 (ocupado)
-    if (func->status != 0) {
-        func->status = 1;
-    }
-
-    long posicao = ftell(out);
-    inserirNaTabela(func->codCliente, posicao);
+Cliente* lerCliente(long posicao) {
+    fseek(arquivoClientes, posicao, SEEK_SET);
+    Cliente* c = (Cliente*)malloc(sizeof(Cliente));
+    fread(c, sizeof(Cliente), 1, arquivoClientes);
+    return c;
 }
 
-Cliente *le(FILE *in) {
-    Cliente *func = (Cliente *)
-    malloc(sizeof(Cliente));
-    
-    if (0 >= fread(&func->codCliente, sizeof(int), 1, in)) {
-        free(func);
-        return NULL;
-    }
-    fread(func->nome, sizeof(char), sizeof(func->nome), in);
-
-    return func;
-}
-
-int calcularIndiceHash(int chave) {
-    return chave % 7;
-}
-
-void buscarCliente(FILE *arquivo, int chave) {
-    Cliente cliente;
-    int indice = calcularIndiceHash(chave);
-
-   // Posicionar-se no início do registro na tabela hash
-    /*fseek(arquivo, sizeof(Cliente) * indice, SEEK_SET);
-
-    // Ler o cliente correspondente
-    fread(&cliente, sizeof(Cliente), 1, arquivo);
-
-    // Verificar se a chave corresponde ao cliente desejado
-    if (cliente.codCliente == chave) {
+void buscarCliente(int chave) {
+    long posicao = buscarNaTabela(chave);
+    if (posicao != -1) {
+        Cliente* c = lerCliente(posicao);
         printf("Cliente encontrado:\n");
-        printf("Chave: %d\n", cliente.codCliente);
-        printf("Nome: %s\n", cliente.nome);
-        // Exibir outros campos do cliente, se necessário
+        printf("Chave: %d\n", c->codCliente);
+        printf("Nome: %s", c->nome);
     } else {
-        printf("\n%d\n", indice);
-        printf("Cliente com chave %d nao encontrado.\n", chave);
-    }*/
+        printf("Cliente com chave %d não encontrado.\n", chave);
+    }
+}
 
-        // Reinicie a busca a partir do início do arquivo
-    rewind(arquivo);
-
-    // Procura o cliente com a chave correspondente
-    while (fread(&cliente, sizeof(Cliente), 1, arquivo) == 1) {
-        if (cliente.codCliente == chave ) {
-            printf("Cliente encontrado:\n");
-            printf("Chave: %d\n", cliente.codCliente);
-            printf("Nome: %s\n", cliente.nome);
-            return; // Cliente encontrado, saia da função
+void marcarPosicaoLivre(int chave) {
+    long posicao = buscarNaTabela(chave);
+    if (posicao != -1) {
+        Cliente* c = lerCliente(posicao);
+        if (c->status == 1) {
+            c->status = 0; // Marque como posição livre
+            fseek(arquivoClientes, posicao, SEEK_SET);
+            fwrite(c, sizeof(Cliente), 1, arquivoClientes);
+            printf("Posição marcada como livre para ser sobrescrita.\n");
+        } else {
+            printf("Cliente com chave %d já marcado como livre.\n", chave);
         }
-        printf("Cliente encontrado:\n");
-        printf("Chave: %d\n", cliente.codCliente);
-        printf("Nome: %s\n", cliente.nome);
+    } else {
+        printf("Cliente com chave %d não encontrado.\n", chave);
     }
 }
 
-void marcarPosicaoLivre(FILE *arquivo, int chave) {
-    Cliente cliente;
+void imprimirTodosClientes() {
+    fseek(arquivoClientes, 0, SEEK_SET);
+    Cliente c;
 
-    // Posicione-se no início do registro correspondente na tabela hash
-    int indice = calcularIndiceHash(chave);
-    fseek(arquivo, sizeof(Cliente) * indice, SEEK_SET);
+    printf("\nLista de Clientes:\n");
 
-    // Ler o cliente correspondente
-    fread(&cliente, sizeof(Cliente), 1, arquivo);
-
-    // Verificar se a chave corresponde ao cliente desejado e se o status é ocupado
-    if (cliente.codCliente == chave && cliente.status != 1) {
-        cliente.status = 0; // Marque como posição livre
-        // Posicione-se novamente no início do registro e atualize o cliente no arquivo
-        fseek(arquivo, sizeof(Cliente) * indice, SEEK_SET);
-        fwrite(&cliente, sizeof(Cliente), 1, arquivo);
-        printf("Posicao marcada como livre para ser sobrescrita.\n");
-    } else {
-        printf("Cliente com chave %d não encontrado ou já marcado como livre.\n", chave);
-       
+    while (fread(&c, sizeof(Cliente), 1, arquivoClientes) == 1) {
+        if (c.status == 1) {
+            printf("Cod: %d", c.codCliente);
+            printf(" | Status: %d",c.status);
+            printf(" | Nome: %s", c.nome);
+            printf("       |  \t   |");
+            printf("\n");
+        }
     }
 }
 
