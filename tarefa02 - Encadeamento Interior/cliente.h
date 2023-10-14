@@ -96,17 +96,21 @@ void criarCliente() {
     printf("Digite o nome da pessoa: ");
     scanf("%*c");
     fgets(c.nome, 100, stdin);
-    printf("Digite a matricula: ");
+    printf("Digite o codigo do cliente: ");
     scanf("%d", &c.codCliente);
     c.status = 1; // Defina o status como 1 (ocupado) por padrão
-
-    // Salvar o cliente no arquivo de clientes e obter a posição no arquivo
-    fseek(arquivoClientes, 0, SEEK_END);
-    long posicao = ftell(arquivoClientes);
-    fwrite(&c, sizeof(Cliente), 1, arquivoClientes);
-
-    // Atualizar a tabela hash com a chave do cliente e a posição no arquivo
-    inserirNaTabela(c.codCliente, posicao);
+    if(buscarOcupado(c.codCliente) == 1 ){
+        printf("Esse codigo ja esta em uso");
+    }
+    else{
+        // Salvar o cliente no arquivo de clientes e obter a posição no arquivo
+        fseek(arquivoClientes, 0, SEEK_END);
+        long posicao = ftell(arquivoClientes);
+        fwrite(&c, sizeof(Cliente), 1, arquivoClientes);
+    
+        // Atualizar a tabela hash com a chave do cliente e a posição no arquivo
+        inserirNaTabela(c.codCliente, posicao);
+    }
 }
 
 Cliente* lerCliente(long posicao) {
@@ -123,9 +127,25 @@ void buscarCliente(int chave) {
         printf("Cliente encontrado:\n");
         printf("Chave: %d\n", c->codCliente);
         printf("Nome: %s", c->nome);
+        
     } else {
         printf("Cliente com chave %d não encontrado.\n", chave);
+        
     }
+    
+}
+
+int buscarOcupado(int chave) {
+    long posicao = buscarNaTabela(chave);
+    if (posicao != -1) {
+        Cliente* c = lerCliente(posicao);
+        
+        return c->status;
+    } else {
+        
+        return 0;
+    }
+    return 0;
 }
 
 void marcarPosicaoLivre(int chave) {
