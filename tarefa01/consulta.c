@@ -163,3 +163,4 @@ void remover(FILE *arquivo, int chave){
     removerCliente(49);
     marcarPosicaoLivre(arquivo, 49);
 }
+

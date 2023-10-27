@@ -24,6 +24,7 @@ int main() {
         switch (opcao) {
             case 1:
                 criarCliente();
+                salvarTabelaHash();
                 break;
             case 2:
                 printf("Digite a chave do cliente a ser buscado: ");
