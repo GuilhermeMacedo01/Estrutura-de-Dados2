@@ -3,6 +3,7 @@
 #include <string.h>
 
 #define TABLE_SIZE 7
+int colisao;
 
 // Estrutura para armazenar um elemento na tabela
 struct Cliente {
@@ -47,16 +48,24 @@ void marcarPosicao(int index, int status, struct Cliente* table[]) {
 //Função para inserir o usuário na tabela
 void insert(char nome[], int codigo, struct Cliente* table[]) {
     int index = hash(codigo, 0, TABLE_SIZE); // Índice inicial
-
+    
+    int quad = 0;
     int attempt = 0;
     while (table[index] != NULL && table[index]->status == 1) {
-        // Se a posição estiver ocupada, tente a próxima posição
-        attempt++;
+        // Se a posição estiver ocupada, tente a próxima posição seguindo o método quadrático
+
+  
+        printf("Bateu no indice: %d\n",index);
+         
+        colisao++;
+        quad++;
+        attempt = attempt+quad;
+
         index = hash(codigo, attempt, TABLE_SIZE);
 
         // Se todas as posições estiverem ocupadas, saia
         if (attempt >= TABLE_SIZE) {
-            printf("Tabela cheia. Nao e possivel inserir o cliente (%s, %d).\n", nome, codigo);
+            printf("Tabela cheia para esse mod. Nao e possivel inserir o cliente (%s, %d).\n", nome, codigo);
             return;
         }
     }
@@ -100,3 +109,6 @@ void printTable(struct Cliente* table[]) {
     }
 }
 
+void printColisao(){
+    printf("O numero de colisoes é : %d\n",colisao);
+}

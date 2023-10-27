@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "Teste.h"
+#include "tentativaQuadratica.h"
 
 
 int main() {
@@ -36,7 +36,7 @@ int main() {
                 if (clienteEncontrado != NULL) {
                     printf("Cliente encontrado: %s, %d\n", clienteEncontrado->nome, clienteEncontrado->codigo);
                 } else {
-                    printf("Cliente com código %d não encontrado.\n", codigoBusca);
+                    printf("Cliente com codigo %d não encontrado.\n", codigoBusca);
                 }
                 break;
             
