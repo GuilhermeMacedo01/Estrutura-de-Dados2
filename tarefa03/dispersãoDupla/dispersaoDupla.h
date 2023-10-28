@@ -4,6 +4,7 @@
 
 #define TABLE_SIZE 7
 
+int colisao;
 int S = TABLE_SIZE - 1;
 
 // Estrutura para armazenar um elemento na tabela
@@ -33,7 +34,7 @@ struct Cliente* search(int codigo, struct Cliente* table[]) {
 
 // Função para calcular o índice na tabela hash
 int hash(int key, int attempt, int size) {
-    return (key % size) + attempt*((key % S)+1);  // Use uma fórmula para tentar posições alternativas
+    return (((key % size) + attempt*((key % S)+1))%size);  // Use uma fórmula para tentar posições alternativas
 }
 //attempt=k e key=x
 
@@ -54,6 +55,9 @@ void insert(char nome[], int codigo, struct Cliente* table[]) {
     int attempt = 0;
     while (table[index] != NULL && table[index]->status == 1) {
         // Se a posição estiver ocupada, tente a próxima posição
+        printf("Bateu no indice: %d\n",index);
+         
+        colisao++;
         attempt++;
         index = hash(codigo, attempt, TABLE_SIZE);
 
@@ -101,4 +105,8 @@ void printTable(struct Cliente* table[]) {
             printf("NULL\n");
         }
     }
+}
+
+void printColisao(){
+    printf("O numero de colisoes é : %d\n",colisao);
 }
