@@ -4,6 +4,8 @@
 
 #define TABLE_SIZE 7
 
+int S = TABLE_SIZE - 1;
+
 // Estrutura para armazenar um elemento na tabela
 struct Cliente {
     char nome[100];
@@ -31,8 +33,9 @@ struct Cliente* search(int codigo, struct Cliente* table[]) {
 
 // Função para calcular o índice na tabela hash
 int hash(int key, int attempt, int size) {
-    return (key + attempt) % size;  // Use uma fórmula para tentar posições alternativas
+    return (key % size) + attempt*((key % S)+1);  // Use uma fórmula para tentar posições alternativas
 }
+//attempt=k e key=x
 
 // Função para marcar a posição
 void marcarPosicao(int index, int status, struct Cliente* table[]) {
