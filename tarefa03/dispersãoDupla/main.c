@@ -18,7 +18,7 @@ int main() {
 
 
     do {
-        printf("\n1. Inserir cliente\n2. Buscar cliente\n3. Marcar posicao livre\n4. Imprimir todos o Clientes\n5. Sair\nEscolha uma alternativa: ");
+        printf("\n1. Inserir cliente\n2. Buscar cliente\n3. Marcar posicao livre\n4. Imprimir todos o Clientes\n5. Imprimir numero de colisoes\n6. Sair\nEscolha uma alternativa: ");
         scanf("%d", &opcao);
 
         switch (opcao) {
@@ -48,11 +48,15 @@ int main() {
                 printf("Posição marcada como livre.\n");
                 break;
 
-            case 4:
+            case 4: ;
                 printTable(table);
                 break;
+
+            case 5:
+                printColisao(colisao);
+                break;
         }
-    } while (opcao != 5);
+    } while (opcao != 6);
 
     return 0;
 }
