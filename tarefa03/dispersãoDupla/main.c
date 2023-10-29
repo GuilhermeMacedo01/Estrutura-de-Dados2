@@ -25,7 +25,7 @@ int main() {
             case 1: ;
                 struct Cliente* novoCliente = criarCliente();
                 insert("teste", novoCliente->codigo, table);
-                printf("Cliente inserido na tabela.\n");
+                
                 break;
             
             case 2: ;
@@ -57,8 +57,18 @@ int main() {
                 break;
             
             case 6:
+                printf("Insira o fator de carga desejado:");
+                scanf("%f", &fatorDeCarga);
+                if(fatorDeCarga>1.0){
+                    printf("o fator de carga deve estar entre 0 e 1");
+                    break;
+                }
+                else{
+                fatorDeCarga = fatorDeCarga * TABLE_SIZE;
+                fatorDeCarga = (int)fatorDeCarga;
                 preencherTabela(table);
                 break;
+                }
         }
     } while (opcao != 7);
 

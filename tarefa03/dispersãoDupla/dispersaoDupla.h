@@ -2,11 +2,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#define TABLE_SIZE 100
+#define TABLE_SIZE 10000
+
 int colisaoTotal;
 int colisao;
 int S = TABLE_SIZE - 1;
-int fatorDeCarga = (0.7 * TABLE_SIZE);
+float fatorDeCarga;
+
 // Estrutura para armazenar um elemento na tabela
 struct Cliente {
     char nome[100];
@@ -24,11 +26,18 @@ struct Cliente* createNode(char nome[], int codigo) {
 
 // Função para buscar um cliente pelo código
 struct Cliente* search(int codigo, struct Cliente* table[]) {
+    double total_search_time = 0;
+    clock_t start_time = clock();
     for (int i = 0; i < TABLE_SIZE; i++) {
         if (table[i] != NULL && table[i]->codigo == codigo) {
+            clock_t end_time = clock();
+            double search_time = (double)(end_time - start_time) / CLOCKS_PER_SEC;
+            total_search_time += search_time;
+            printf("Tempo de busca: %lf segundos\n", total_search_time);
             return table[i];
         }
     }
+   
     return NULL; // Cliente não encontrado
 }
 
@@ -44,9 +53,6 @@ void preencherTabela(struct Cliente* table[]){
         int codigo = rand() % 10000;  // Gere um número aleatório entre 0 e 999
 
         // Garanta que o código gerado esteja dentro do intervalo aceitável
-        while (codigo >= table_size) {
-            codigo = rand() % 10000;
-        }
         insert("teste",codigo, table);
 
     }
@@ -64,25 +70,31 @@ void marcarPosicao(int index, int status, struct Cliente* table[]) {
 //Função para inserir o usuário na tabela
 void insert(char nome[], int codigo, struct Cliente* table[]) {
     int index = hash(codigo, 0, TABLE_SIZE); // Índice inicial
-
     int attempt = 0;
-    while (table[index] != NULL && table[index]->status == 1) {
-        // Se a posição estiver ocupada, tente a próxima posição
-        printf("Bateu no indice: %d\n",index);
-        colisaoTotal++;
-        colisao++;
-        attempt++;
-        index = hash(codigo, attempt, TABLE_SIZE);
+    if(table[index] != NULL && table[index]->codigo == codigo){
+        printf("O codigo inserido ja pertence a outro cliente\n");
+        return;
+    }
+    else{
+        while (table[index] != NULL && table[index]->status == 1) {
+            // Se a posição estiver ocupada, tente a próxima posição
+            printf("Bateu no indice: %d\n",index);
+            colisaoTotal++;
+            colisao++;
+            attempt++;
+            index = hash(codigo, attempt, TABLE_SIZE);
 
-        // Se todas as posições estiverem ocupadas, saia
-        if (attempt >= TABLE_SIZE) {
-            printf("Tabela cheia. Nao e possivel inserir o cliente (%s, %d).\n", nome, codigo);
-            return;
+            // Se todas as posições estiverem ocupadas, saia
+            if (attempt >= TABLE_SIZE) {
+                printf("Tabela cheia. Nao e possivel inserir o cliente (%s, %d).\n", nome, codigo);
+                return;
         }
     }
     printColisao();
+    printf("Cliente inserido na tabela.\n");
     table[index] = createNode(nome, codigo);
     table[index]->status = 1; // Marcar a posição como ocupada
+    }
 }
 
 //Função para marcar a posição como livre
