@@ -3,7 +3,7 @@
 #include <string.h>
 #include <time.h>
 #define TABLE_SIZE 100
-int colisao;
+int colisao;   
 int colisaoTotal;
 float fatorDeCarga;
 
@@ -24,20 +24,33 @@ struct Cliente* createNode(char nome[], int codigo) {
 
 // Função para buscar um cliente pelo código
 struct Cliente* search(int codigo, struct Cliente* table[]) {
+    
+    int end = hash(codigo, 0, TABLE_SIZE); // Índice inicial
+    int tentativa = 0;
     double total_search_time = 0;
     clock_t start_time = clock();
-    for (int i = 0; i < TABLE_SIZE; i++) {
-        if (table[i] != NULL && table[i]->codigo == codigo) {
+    while (table[end] != NULL) {
+        if (table[end]->status == 1 && table[end]->codigo == codigo) {
             clock_t end_time = clock();
             double search_time = (double)(end_time - start_time) / CLOCKS_PER_SEC;
             total_search_time += search_time;
-            printf("Tempo de busca: %lf segundos\n", total_search_time);
-            return table[i];
+            printf("O tempo foi: %.70lf segundos\n", total_search_time);
+            return table[end]; // Elemento encontrado
+        }
+
+        tentativa++;
+        end = hash(codigo, tentativa, TABLE_SIZE);
+
+        // Se todas as posições foram verificadas e o elemento não foi encontrado, saia
+        if (tentativa >= TABLE_SIZE) {
+           
+            break;
         }
     }
-   
+
     return NULL; // Cliente não encontrado
 }
+
 
 // Função para calcular o índice na tabela hash
 int hash(int key, int attempt, int size) {
