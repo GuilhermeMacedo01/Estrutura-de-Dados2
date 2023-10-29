@@ -1,12 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include <time.h>
 #define TABLE_SIZE 7
 int colisao;
 int colisao;
 int colisaoTotal;
-int fatorDeCarga = (0.7 * TABLE_SIZE);
+float fatorDeCarga;
 
 // Estrutura para armazenar um elemento na tabela
 struct Cliente {
@@ -25,11 +25,18 @@ struct Cliente* createNode(char nome[], int codigo) {
 
 // Função para buscar um cliente pelo código
 struct Cliente* search(int codigo, struct Cliente* table[]) {
+    double total_search_time = 0;
+    clock_t start_time = clock();
     for (int i = 0; i < TABLE_SIZE; i++) {
         if (table[i] != NULL && table[i]->codigo == codigo) {
+            clock_t end_time = clock();
+            double search_time = (double)(end_time - start_time) / CLOCKS_PER_SEC;
+            total_search_time += search_time;
+            printf("Tempo de busca: %lf segundos\n", total_search_time);
             return table[i];
         }
     }
+   
     return NULL; // Cliente não encontrado
 }
 
@@ -59,7 +66,7 @@ void insert(char nome[], int codigo, struct Cliente* table[]) {
 
   
         printf("Bateu no indice: %d\n",index);
-         
+        colisaoTotal++;
         colisao++;
         quad++;
         attempt = attempt+quad;
