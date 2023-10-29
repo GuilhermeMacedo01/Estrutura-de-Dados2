@@ -3,6 +3,9 @@
 #include <string.h>
 
 #define TABLE_SIZE 7
+int colisao;
+int colisaoTotal;
+int fatorDeCarga = (0.7 * TABLE_SIZE);
 
 // Estrutura para armazenar um elemento na tabela
 struct Cliente {
@@ -48,21 +51,30 @@ void marcarPosicao(int index, int status, struct Cliente* table[]) {
 void insert(char nome[], int codigo, struct Cliente* table[]) {
     int index = hash(codigo, 0, TABLE_SIZE); // Índice inicial
 
-    int attempt = 0;
-    while (table[index] != NULL && table[index]->status == 1) {
-        // Se a posição estiver ocupada, tente a próxima posição
-        attempt++;
-        index = hash(codigo, attempt, TABLE_SIZE);
-
-        // Se todas as posições estiverem ocupadas, saia
-        if (attempt >= TABLE_SIZE) {
-            printf("Tabela cheia. Nao e possivel inserir o cliente (%s, %d).\n", nome, codigo);
-            return;
-        }
+    if(table[index] != NULL && table[index]->codigo == codigo){
+        printf("O codigo inserido ja pertence a outro cliente\n");
+        return;
     }
 
-    table[index] = createNode(nome, codigo);
-    table[index]->status = 1; // Marcar a posição como ocupada
+    else{
+        int attempt = 0;
+        while (table[index] != NULL && table[index]->status == 1) {
+            // Se a posição estiver ocupada, tente a próxima posição
+
+            colisao++;
+            attempt++;
+            index = hash(codigo, attempt, TABLE_SIZE);
+
+            // Se todas as posições estiverem ocupadas, saia
+            if (attempt >= TABLE_SIZE) {
+                printf("Tabela cheia. Nao e possivel inserir o cliente (%s, %d).\n", nome, codigo);
+                return;
+            }
+        }
+
+        table[index] = createNode(nome, codigo);
+        table[index]->status = 1; // Marcar a posição como ocupada
+    }
 }
 
 //Função para marcar a posição como livre
@@ -100,3 +112,24 @@ void printTable(struct Cliente* table[]) {
     }
 }
 
+void preencherTabela(struct Cliente* table[]){
+    srand(time(NULL));
+    int table_size = TABLE_SIZE;
+    for (int i = 0; i < fatorDeCarga; i++) {
+        int codigo = rand() % 10000;  // Gere um número aleatório entre 0 e 999
+
+        // Garanta que o código gerado esteja dentro do intervalo aceitável
+        insert("teste",codigo, table);
+
+    }
+}
+
+void printTodasColisao(){
+    printf("O numero de colisoes é : %d\n",colisaoTotal);
+}
+
+void printColisao(){
+    printf("O numero de colisoes é : %d\n",colisao);
+    colisao = 0;
+    return colisao;
+}

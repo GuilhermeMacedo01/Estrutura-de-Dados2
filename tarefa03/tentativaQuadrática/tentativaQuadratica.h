@@ -4,6 +4,9 @@
 
 #define TABLE_SIZE 7
 int colisao;
+int colisao;
+int colisaoTotal;
+int fatorDeCarga = (0.7 * TABLE_SIZE);
 
 // Estrutura para armazenar um elemento na tabela
 struct Cliente {
@@ -111,4 +114,26 @@ void printTable(struct Cliente* table[]) {
 
 void printColisao(){
     printf("O numero de colisoes é : %d\n",colisao);
+}
+
+void preencherTabela(struct Cliente* table[]){
+    srand(time(NULL));
+    int table_size = TABLE_SIZE;
+    for (int i = 0; i < fatorDeCarga; i++) {
+        int codigo = rand() % 10000;  // Gere um número aleatório entre 0 e 999
+
+        // Garanta que o código gerado esteja dentro do intervalo aceitável
+        insert("teste",codigo, table);
+
+    }
+}
+
+void printTodasColisao(){
+    printf("O numero de colisoes é : %d\n",colisaoTotal);
+}
+
+void printColisao(){
+    printf("O numero de colisoes é : %d\n",colisao);
+    colisao = 0;
+    return colisao;
 }

@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "Teste.h"
+#include "tentativaLinear.h"
 
 
 int main() {
@@ -18,13 +18,13 @@ int main() {
 
 
     do {
-        printf("\n1. Inserir cliente\n2. Buscar cliente\n3. Marcar posicao livre\n4. Imprimir todos o Clientes\n5. Sair\nEscolha uma alternativa: ");
+        printf("\n1. Inserir cliente\n2. Buscar cliente\n3. Marcar posicao livre\n4. Imprimir todos o clientes\n5. Imprimir numero total de colisoes\n6. Preencher tabela automaticamente\n7. Sair\nEscolha uma alternativa: ");
         scanf("%d", &opcao);
 
         switch (opcao) {
             case 1: ;
                 struct Cliente* novoCliente = criarCliente();
-                insert(novoCliente->nome, novoCliente->codigo, table);
+                insert("teste", novoCliente->codigo, table);
                 printf("Cliente inserido na tabela.\n");
                 break;
             
@@ -48,11 +48,29 @@ int main() {
                 printf("Posição marcada como livre.\n");
                 break;
 
-            case 4:
+            case 4: ;
                 printTable(table);
                 break;
+
+            case 5: ;
+                printTodasColisao(colisaoTotal);
+                break;
+            
+            case 6: ;
+                printf("Insira o fator de carga desejado:");
+                scanf("%f", &fatorDeCarga);
+                if(fatorDeCarga>1.0){
+                    printf("o fator de carga deve estar entre 0 e 1");
+                    break;
+                }
+                else{
+                fatorDeCarga = fatorDeCarga * TABLE_SIZE;
+                fatorDeCarga = (int)fatorDeCarga;
+                preencherTabela(table);
+                break;
+                }
         }
-    } while (opcao != 5);
+    } while (opcao != 7);
 
     return 0;
 }
