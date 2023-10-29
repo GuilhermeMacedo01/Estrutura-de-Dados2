@@ -24,7 +24,7 @@ int main() {
         switch (opcao) {
             case 1: ;
                 struct Cliente* novoCliente = criarCliente();
-                insert("teste", novoCliente->codigo, table);
+                insert(novoCliente->nome, novoCliente->codigo, table);
                 
                 break;
             

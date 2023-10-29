@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#define TABLE_SIZE 10000
+#define TABLE_SIZE 10
 
 int colisaoTotal;
 int colisao;
