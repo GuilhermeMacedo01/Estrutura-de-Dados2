@@ -2,11 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define TABLE_SIZE 7
-int colisao;
+#define TABLE_SIZE 100
 int colisao;
 int colisaoTotal;
-int fatorDeCarga = (0.7 * TABLE_SIZE);
+float fatorDeCarga;
 
 // Estrutura para armazenar um elemento na tabela
 struct Cliente {
@@ -72,7 +71,7 @@ void insert(char nome[], int codigo, struct Cliente* table[]) {
             return;
         }
     }
-
+    colisaoTotal += colisao;
     table[index] = createNode(nome, codigo);
     table[index]->status = 1; // Marcar a posição como ocupada
 }
@@ -112,9 +111,6 @@ void printTable(struct Cliente* table[]) {
     }
 }
 
-void printColisao(){
-    printf("O numero de colisoes é : %d\n",colisao);
-}
 
 void preencherTabela(struct Cliente* table[]){
     srand(time(NULL));
