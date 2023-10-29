@@ -3,7 +3,7 @@
 #include <string.h>
 
 #define TABLE_SIZE 7
-
+int colisaoTotal;
 int colisao;
 int S = TABLE_SIZE - 1;
 
@@ -56,7 +56,7 @@ void insert(char nome[], int codigo, struct Cliente* table[]) {
     while (table[index] != NULL && table[index]->status == 1) {
         // Se a posição estiver ocupada, tente a próxima posição
         printf("Bateu no indice: %d\n",index);
-         
+        colisaoTotal++;
         colisao++;
         attempt++;
         index = hash(codigo, attempt, TABLE_SIZE);
@@ -67,7 +67,7 @@ void insert(char nome[], int codigo, struct Cliente* table[]) {
             return;
         }
     }
-
+    printColisao();
     table[index] = createNode(nome, codigo);
     table[index]->status = 1; // Marcar a posição como ocupada
 }
@@ -107,6 +107,12 @@ void printTable(struct Cliente* table[]) {
     }
 }
 
+void printTodasColisao(){
+    printf("O numero de colisoes é : %d\n",colisaoTotal);
+}
+
 void printColisao(){
     printf("O numero de colisoes é : %d\n",colisao);
+    colisao = 0;
+    return colisao;
 }
