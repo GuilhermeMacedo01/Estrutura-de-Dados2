@@ -1,12 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#define TABLE_SIZE 7
+#include <time.h>
+#define TABLE_SIZE 100
 int colisaoTotal;
 int colisao;
 int S = TABLE_SIZE - 1;
-
+int fatorDeCarga = (0.7 * TABLE_SIZE);
 // Estrutura para armazenar um elemento na tabela
 struct Cliente {
     char nome[100];
@@ -36,8 +36,21 @@ struct Cliente* search(int codigo, struct Cliente* table[]) {
 int hash(int key, int attempt, int size) {
     return (((key % size) + attempt*((key % S)+1))%size);  // Use uma fórmula para tentar posições alternativas
 }
-//attempt=k e key=x
 
+void preencherTabela(struct Cliente* table[]){
+    srand(time(NULL));
+    int table_size = TABLE_SIZE;
+    for (int i = 0; i < fatorDeCarga; i++) {
+        int codigo = rand() % 10000;  // Gere um número aleatório entre 0 e 999
+
+        // Garanta que o código gerado esteja dentro do intervalo aceitável
+        while (codigo >= table_size) {
+            codigo = rand() % 10000;
+        }
+        insert("teste",codigo, table);
+
+    }
+}
 // Função para marcar a posição
 void marcarPosicao(int index, int status, struct Cliente* table[]) {
     if (index >= 0 && index < TABLE_SIZE) {
